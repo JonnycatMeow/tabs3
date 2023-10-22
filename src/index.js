@@ -4,6 +4,7 @@ import { createServer as createHttpsServer } from "node:https";
 import { createServer as createHttpServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import serveStatic from "serve-static";
+import { WebExtensionBlocker } from '@cliqz/adblocker-webextension'; //adblocker
 
 const bare = createBareServer("/bare/");
 const serve = serveStatic(fileURLToPath(new URL("../static/", import.meta.url)), { fallthrough: false });
@@ -26,6 +27,9 @@ server.on("request", (req, res) => {
   }
 });
 
+WebExtensionBlocker.fromPrebuiltAdsAndTracking().then((blocker) => {
+  blocker.enableBlockingInBrowser(browser);
+});
 server.on("upgrade", (req, socket, head) => {
   if(bare.shouldRoute(req, socket, head)) bare.routeUpgrade(req, socket, head); else socket.end();
 });
