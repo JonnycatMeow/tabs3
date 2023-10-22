@@ -4,7 +4,6 @@ import { createServer as createHttpsServer } from "node:https";
 import { createServer as createHttpServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import serveStatic from "serve-static";
-import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
 const bare = createBareServer("/bare/");
 const serve = serveStatic(fileURLToPath(new URL("../static/", import.meta.url)), { fallthrough: false });
 var server;
@@ -25,10 +24,6 @@ server.on("request", (req, res) => {
     })
   }
 });
-
-const blocker = await WebExtensionBlocker.fromLists(fetch, [
-  'https://easylist.to/easylist/easylist.txt' //gets the adblock from a list
-]);
 
 server.on("upgrade", (req, socket, head) => {
   if(bare.shouldRoute(req, socket, head)) bare.routeUpgrade(req, socket, head); else socket.end();
